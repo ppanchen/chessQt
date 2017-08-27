@@ -77,10 +77,22 @@ Item {
       text: "Save"
 
       onClicked: {
-        logic.save();
-//        ld.source = "/qml/start.qml";
+          fileDialogSave.open();
       }
     }
+
+    FileDialog {
+         id: fileDialogSave
+         folder: "."
+         title: "Save file"
+         selectMultiple: false
+         nameFilters: [ "Save file (*.sf)"]
+         selectExisting: false
+         onAccepted: {
+             logic.save(fileDialogSave.fileUrls);
+         }
+    }
+
     Button {
       id: stopButton
       anchors.left: gameBoard.right

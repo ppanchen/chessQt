@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
 
 Item {
+    id:loadScreen
     width: 800
     height: 600
 
@@ -32,35 +33,6 @@ Item {
           y: squareSize * positionY
 
           source: images[type].imgPath
-
-//          MouseArea {
-//            anchors.fill: parent
-//            drag.target: parent
-
-//            property int startX: 0
-//            property int startY: 0
-
-//            onPressed: {
-//              startX = parent.x;
-//              startY = parent.y;
-//            }
-
-//            onReleased: {
-//              var fromX = startX / squareSize;
-//              var fromY = startY / squareSize;
-//              var toX   = Math.floor((parent.x + mouseX) / squareSize);
-//              var toY   = Math.floor((parent.y + mouseY) / squareSize);
-
-//              if (!logic.move(fromX, fromY, toX, toY)) {
-//                parent.x = startX;
-//                parent.y = startY;
-//              }
-//              else{
-//                  parent.x = squareSize * positionX;
-//                  parent.y = squareSize * positionY;
-//              }
-//            }
-//          }
         }
       }
     }
@@ -130,8 +102,19 @@ Item {
       text: "Load"
 
       onClicked: {
-          logic.load()
-          ld.source = "/qml/load.qml"
+          fileDialogLoad.open();
       }
     }
+
+    FileDialog {
+         id: fileDialogLoad
+         folder: "."
+         title: "Choose a file to open"
+         selectMultiple: false
+         nameFilters: [ "Save file (*.sf)"]
+         onAccepted: {
+             logic.load(fileDialogLoad.fileUrls);
+             ld.source = "/qml/load.qml";
+         }
+     }
 }

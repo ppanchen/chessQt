@@ -47,8 +47,18 @@ Item {
       text: "Load"
 
       onClicked: {
-          logic.load()
-          ld.source = "/qml/load.qml"
+          fileDialogLoad.open();
       }
     }
+    FileDialog {
+         id: fileDialogLoad
+         folder: "."
+         title: "Choose a file to open"
+         selectMultiple: false
+         nameFilters: [ "Save file (*.sf)"]
+         onAccepted: {
+             logic.load(fileDialogLoad.fileUrl);
+             ld.source = "/qml/load.qml";
+         }
+     }
 }

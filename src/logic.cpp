@@ -112,6 +112,7 @@ bool Logic::setData(const QModelIndex &index, const QVariant &value, int role)
 }
 
 bool Logic::removeRows(int index, int rows, const QModelIndex &parent) {
+     (void)parent;
      beginRemoveRows(QModelIndex(), index, index + rows - 1);
 
      for (int row = 0; row < rows; ++row) {
@@ -157,14 +158,10 @@ void Logic::start() {
     this->firstMove = true;
 }
 
-void Logic::load() {
-    QString fileName = QFileDialog::getOpenFileName(0,
-        tr("Load Game"), "", tr("Saved file (*.sf)"));
-
+void Logic::load(QString fileName) {
     QRegExp rx1("^(Move)[|]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}$");
     QRegExp rx2("^(Delete)[|]{1}[0-9]{1,2}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[;]{1}(Move)[|]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}$");
-
-    QFile file(fileName);
+    QFile file(fileName.right(fileName.length() - 7));
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
 //          show_msg("error was detected while loading file!");
@@ -184,11 +181,9 @@ void Logic::load() {
     }
 }
 
-void Logic::save() {
-    QString fileName = QFileDialog::getSaveFileName(0, tr("Save File"),
-                               "save.sf",
-                               tr("Saved file (*.sf)"));
-    QFile file(fileName);
+void Logic::save(QString fileName) {
+    fileName = fileName.right(3) == ".sf" ? fileName : fileName + ".sf";
+    QFile file(fileName.right(fileName.length() - 7));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
           show_msg("error was detected while saving file!");
           return;
@@ -201,7 +196,6 @@ void Logic::save() {
         out << *it;
         it++;
     }
-
 }
 
 void Logic::clear() {
@@ -263,7 +257,6 @@ bool Logic::nextStep(){
     if (loadedFile.isEmpty() || step == loadedFile.length())
         return true;
     step++;
-//    Action *leak = new Action();
     QVector <Action> act = parse_step(step - 1);
     if (act.isEmpty())
         return false;
@@ -305,10 +298,7 @@ QVector <Action> Logic::parse_step(int step){
      QString str = loadedFile.at(step);
      QStringList commands = str.split(";");
      foreach (const QString &com, commands) {
-         qDebug() << com;            //debug
          QStringList parts =  com.split("|");
-//         if (parts.length() != 2)
-//             break;
          QString name = parts.at(0);
 
          QStringList argList = parts.at(1).split(",");
@@ -317,17 +307,9 @@ QVector <Action> Logic::parse_step(int step){
              args << arg.toInt();
          act << Action { name, args };
      }
-//     if (act.length() == 2) {
          if (act.length() == 2 && (act[0].args[0] > 11 ||
              (act[1].args[2] != act[0].args[1] && act[1].args[3] != act[0].args[2])))
              act.clear();
-//     }
-//     else if (act.length() == 1) {
-//         if (act.at(0).args.length() != 4 && act.at(0).name != "Move")
-//             act.clear();
-//     }
-//     else
-//          act.clear();
      return act;
 }
 
@@ -361,6 +343,7 @@ bool Logic::pawns_move_beat(int fromX, int fromY, int toX, int toY, int type){
 }
 
 bool Logic:: bishop_move(int fromX, int fromY, int toX, int toY, int type){
+        (void)type;
         if (qFabs(fromX - toX) != qFabs(fromY - toY))
             return false;
         for (int i = 1; i < qFabs(fromX - toX); ++i) {
@@ -393,6 +376,7 @@ bool Logic:: bishop_move(int fromX, int fromY, int toX, int toY, int type){
 }
 
 bool Logic::rook_move(int fromX, int fromY, int toX, int toY, int type){
+    (void)type;
     int direction = fromY == toY ? 1 : (fromX == toX ? 2 : 0); //1 - hor; 2 - ver; 0 - error
     if (!direction)
         return false;
@@ -416,16 +400,17 @@ bool Logic::rook_move(int fromX, int fromY, int toX, int toY, int type){
 }
 
 bool Logic::knight_move(int fromX, int fromY, int toX, int toY, int type){
-        if (!((qFabs(fromX - toX) == 2 && qFabs(fromY - toY) == 1)
-              || (qFabs(fromX - toX) == 1 && qFabs(fromY - toY) == 2)))
-            return false;
+    (void)type;
+    if (!((qFabs(fromX - toX) == 2 && qFabs(fromY - toY) == 1)
+          || (qFabs(fromX - toX) == 1 && qFabs(fromY - toY) == 2)))
+        return false;
     return true;
 }
 
 bool Logic::king_move(int fromX, int fromY, int toX, int toY, int type){
-        if (qFabs(fromX - toX) > 1 || qFabs(fromY - toY) > 1)
-            return false;
-
+    (void)type;
+    if (qFabs(fromX - toX) > 1 || qFabs(fromY - toY) > 1)
+        return false;
     return true;
 }
 

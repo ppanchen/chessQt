@@ -5,6 +5,7 @@
 #include <QQmlApplicationEngine>
 #include <QVector>
 #include <QFile>
+#include <string>
 
 struct Action
 {
@@ -51,8 +52,8 @@ public:
     int                     boardSize() const;
     Q_INVOKABLE void        clear();
     Q_INVOKABLE void        start();
-    Q_INVOKABLE void        load();
-    Q_INVOKABLE void        save();
+    Q_INVOKABLE void        load(QString);
+    Q_INVOKABLE void        save(QString);
     Q_INVOKABLE void        show_msg(const QString &);
     Q_INVOKABLE bool        prevStep();
     Q_INVOKABLE bool        nextStep();
