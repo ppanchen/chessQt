@@ -161,13 +161,15 @@ void Logic::start() {
 void Logic::load(QString fileName) {
     QRegExp rx1("^(Move)[|]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}$");
     QRegExp rx2("^(Delete)[|]{1}[0-9]{1,2}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[;]{1}(Move)[|]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}[,]{1}[0-7]{1}$");
-    QFile file(fileName.right(fileName.length() - 7));
+    fileName = QSysInfo::productType() == "windows" ? fileName.right(fileName.length() - 8):
+                                                      fileName.right(fileName.length() - 7);
+    QFile file(fileName);
 
+    this->start();
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//          show_msg("error was detected while loading file!");
+          show_msg("error was detected while loading file!");
           return;
     }
-    this->start();
     step = 0;
     QTextStream in(&file);
     while (!in.atEnd()) {
@@ -183,7 +185,9 @@ void Logic::load(QString fileName) {
 
 void Logic::save(QString fileName) {
     fileName = fileName.right(3) == ".sf" ? fileName : fileName + ".sf";
-    QFile file(fileName.right(fileName.length() - 7));
+    fileName = QSysInfo::productType() == "windows" ? fileName.right(fileName.length() - 8):
+                                                      fileName.right(fileName.length() - 7);
+    QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
           show_msg("error was detected while saving file!");
           return;
